@@ -137,7 +137,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private synchronized ClientThread findUser(String value){
         for (int i = 0; i < clients.size(); i++) {
             ClientThread clientThread = (ClientThread) clients.get(i);
-            if(clientThread.isAuthorized()) continue;
+            if(!clientThread.isAuthorized()) continue;
             if(clientThread.getNickname().equals(value)) {
                 return clientThread;
             }
@@ -145,7 +145,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         return null;
     }
 
-    void handleAuthMessages(ClientThread client, String value) {
+    private void handleAuthMessages(ClientThread client, String value) {
         String[] msg = value.split(Messages.DELIMITER);
         switch (msg[0]) {
             case Messages.TYPE_RANGECATS:
@@ -157,7 +157,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     }
 
-    void handleNonAuthMessages(ClientThread client, String value) {
+    private void handleNonAuthMessages(ClientThread client, String value) {
         String[] arr = value.split(Messages.DELIMITER);
         if (arr.length != 3 || !arr[0].equals(Messages.AUTH_REQUEST)) {
             client.msgFormatError(value);
@@ -173,7 +173,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             return;
         }
         ClientThread clientThread = findUser(nickname);
-        if(clientThread != null){
+        if(clientThread == null){
             client.authorizeAccept(nickname);
             sendToAuthorizedClients(Messages.getTypeBroadcast("Server", nickname + " connected"));
         } else {

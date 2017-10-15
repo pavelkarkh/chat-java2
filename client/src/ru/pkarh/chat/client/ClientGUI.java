@@ -35,8 +35,8 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
     private final JTextArea log = new JTextArea();
 
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
-    //    private final JTextField tfIPAddress = new JTextField("127.0.0.1");
-    private final JTextField tfIPAddress = new JTextField("95.84.209.91");
+    private final JTextField tfIPAddress = new JTextField("127.0.0.1");
+    // private final JTextField tfIPAddress = new JTextField("95.84.209.91");
     private final JTextField tfPort = new JTextField("8189");
     private final JCheckBox cbAlwaysOnTop = new JCheckBox("Always on top");
     private final JTextField tfLogin = new JTextField("Pavel");
