@@ -148,7 +148,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private void handleAuthMessages(ClientThread client, String value) {
         String[] msg = value.split(Messages.DELIMITER);
         switch (msg[0]) {
-            case Messages.TYPE_RANGECATS:
+            case Messages.TYPE_RANGECAST:
                 sendToAuthorizedClients(Messages.getTypeBroadcast(client.getNickname(), msg[1]));
                 break;
             default:

@@ -13,12 +13,9 @@ import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler,
         ActionListener, SocketThreadListener {
-
-    public static final String CHAT_CLIENT = "Chat Client";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -31,12 +28,12 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
 
     private static final int WIDTH = 600;
     private static final int HEIGHT = 300;
+    private static final String CHAT_CLIENT = "Chat Client";
 
     private final JTextArea log = new JTextArea();
 
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
     private final JTextField tfIPAddress = new JTextField("127.0.0.1");
-    // private final JTextField tfIPAddress = new JTextField("95.84.209.91");
     private final JTextField tfPort = new JTextField("8189");
     private final JCheckBox cbAlwaysOnTop = new JCheckBox("Always on top");
     private final JTextField tfLogin = new JTextField("Pavel");
@@ -53,7 +50,7 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
 
     private SocketThread socketThread;
 
-    ClientGUI() {
+    private ClientGUI() {
         Thread.setDefaultUncaughtExceptionHandler(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,7 +111,7 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
         }
     }
 
-    void sendMessage() {
+    private void sendMessage() {
         String msg = tfMessage.getText();
         if ("".equals(msg)) return;
         tfMessage.setText(null);
@@ -195,7 +192,6 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
                     putLog(dateFormat.format(Long.parseLong(msg[1])) + " " + msg[2] + ": " + msg[3]);
                     break;
                 case Messages.AUTH_ACCEPT:
-                    putLog(msg[1] + " connected");
                     setTitle(CHAT_CLIENT + " nickname: " + msg[1]);
                     break;
                 case Messages.AUTH_DENIED:

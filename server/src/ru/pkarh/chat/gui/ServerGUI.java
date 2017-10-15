@@ -24,6 +24,7 @@ public class ServerGUI extends JFrame implements ActionListener,
     private static final int POS_Y = 600;
     private static final int WIDTH = 700;
     private static final int HEIGHT = 400;
+    private static final int PORT = 8189;
 
     private final ChatServer chatServer = new ChatServer(this);
 
@@ -32,7 +33,7 @@ public class ServerGUI extends JFrame implements ActionListener,
     private final JButton btnStop = new JButton("Stop");
     private final JTextArea log = new JTextArea();
 
-    ServerGUI() {
+    private ServerGUI() {
         Thread.setDefaultUncaughtExceptionHandler(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBounds(POS_X, POS_Y, WIDTH, HEIGHT);
@@ -55,11 +56,16 @@ public class ServerGUI extends JFrame implements ActionListener,
         setVisible(true);
     }
 
+    private void putLog(String s) {
+        log.append(s + "\n");
+        log.setCaretPosition(log.getDocument().getLength());
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
         if (src == btnStart) {
-            chatServer.start(8189);
+            chatServer.start(PORT);
         } else if (src == btnStop) {
             chatServer.stop();
         } else {
@@ -89,8 +95,7 @@ public class ServerGUI extends JFrame implements ActionListener,
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                log.append(message + "\n");
-                log.setCaretPosition(log.getDocument().getLength());
+                putLog(message);
             }
         });
     }
