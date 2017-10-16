@@ -173,10 +173,10 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     }
 
-    private void handleNonAuthMessages(ClientThread client, String value) {
+    private void handleNonAuthMessages(ClientThread newClient, String value) {
         String[] arr = value.split(Messages.DELIMITER);
         if (arr.length != 3 || !arr[0].equals(Messages.AUTH_REQUEST)) {
-            client.msgFormatError(value);
+            newClient.msgFormatError(value);
             return;
         }
         String login = arr[1];
@@ -185,16 +185,17 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         if (nickname == null) {
             putLog("Invalid login/password: login '" +
                     login + "' password: '" + password + "'");
-            client.authorizeError();
+            newClient.authorizeError();
             return;
         }
-        ClientThread clientThread = findUser(nickname);
-        if(clientThread == null){
-            client.authorizeAccept(nickname);
+        ClientThread oldClient = findUser(nickname);
+        newClient.authorizeAccept(nickname);
+
+        if(oldClient == null){
             sendToAuthorizedClients(Messages.getTypeBroadcast("Server", nickname + " connected"));
         } else {
-            clientThread.setReconnected();
-            clients.remove(clientThread);
+            oldClient.setReconnected();
+            clients.remove(oldClient);
         }
 
         sendToAuthorizedClients(Messages.getUserList(getUsers()));
