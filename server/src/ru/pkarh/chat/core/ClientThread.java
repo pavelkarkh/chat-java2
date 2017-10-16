@@ -8,16 +8,17 @@ import java.net.Socket;
 
 public class ClientThread extends SocketThread {
 
-    public ClientThread(SocketThreadListener listener, String name, Socket socket) {
+    ClientThread(SocketThreadListener listener, String name, Socket socket) {
         super(listener, name, socket);
     }
 
     private String nickname;
-    private boolean isAuthorized;
-    private boolean isReconnected;
+    private boolean authorized;
+    private boolean reconnected;
+    private int timeLive;
 
     public boolean isReconnected() {
-        return isReconnected;
+        return reconnected;
     }
 
     String getNickname() {
@@ -25,17 +26,21 @@ public class ClientThread extends SocketThread {
     }
 
     boolean isAuthorized() {
-        return isAuthorized;
+        return authorized;
     }
 
     void authorizeAccept(String nickname) {
-        isAuthorized = true;
+        authorized = true;
         this.nickname = nickname;
         sendMessage(Messages.getAuthAccept(nickname));
     }
 
     void authorizeError() {
         sendMessage(Messages.getAuthDenied());
+    }
+
+    void timeout() {
+        sendMessage(Messages.getTimeout());
         close();
     }
 
@@ -45,8 +50,16 @@ public class ClientThread extends SocketThread {
     }
 
     void setReconnected(){
-        isReconnected = true;
+        reconnected = true;
         close();
+    }
+
+    int getTimeLive() {
+        return timeLive;
+    }
+
+    void increaseTimeLive(int timeLive) {
+        this.timeLive += timeLive;
     }
 
 }

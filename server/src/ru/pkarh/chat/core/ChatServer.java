@@ -17,6 +17,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private ServerSocketThread serverSocketThread;
     private final ChatServerListener listener;
     private final DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss: ");
+    private final int serverSocketTimeout = 2000;
 
     private Vector<SocketThread> clients = new Vector<>();
 
@@ -27,17 +28,20 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void start(int port) {
         if (serverSocketThread != null && serverSocketThread.isAlive())
             putLog("Server is already running");
-        else
-            serverSocketThread = new ServerSocketThread(this, "Server thread", port, 2000);
-        SqlClient.connect();
+        else {
+            serverSocketThread = new ServerSocketThread(this, "Server thread", port, serverSocketTimeout);
+            SqlClient.connect();
+        }
     }
 
     public void stop() {
-        if (serverSocketThread == null || !serverSocketThread.isAlive())
+        if (serverSocketThread == null || !serverSocketThread.isAlive()) {
             putLog("Server is not running");
-        else
+        }
+        else {
             serverSocketThread.interrupt();
-        SqlClient.disconnect();
+            SqlClient.disconnect();
+        }
     }
 
     private void putLog(String msg) {
@@ -52,33 +56,43 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             ClientThread clientThread = (ClientThread) clients.get(i);
             if(!clientThread.isAuthorized()) continue;
             sb.append(clientThread.getNickname()).append(Messages.DELIMITER);
-
         }
         return sb.toString();
     }
 
     /**
-     * События Server socket thread'a
+     * Server socket thread event
+     *
      * */
 
     @Override
     public void onStartServerSocketThread(ServerSocketThread thread) {
-        putLog("Сервер запущен");
+        putLog("Server start");
     }
 
     @Override
     public void onStopServerSocketThread(ServerSocketThread thread) {
-        putLog("сервер остановлен");
+        putLog("Server stop");
     }
 
     @Override
     public void onCreateServerSocket(ServerSocketThread thread, ServerSocket serverSocket) {
-        putLog("создан Server socket");
+        putLog("Server socket create");
     }
 
     @Override
     public void onAcceptTimeout(ServerSocketThread thread, ServerSocket serverSocket) {
-
+        if(clients != null){
+            for (int i = 0; i < clients.size(); i++) {
+                ClientThread client = (ClientThread) clients.get(i);
+                if(!client.isAuthorized()) {
+                    client.increaseTimeLive(serverSocketTimeout/1000);
+                    if(client.getTimeLive() >= 120) {
+                        client.timeout();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -94,7 +108,8 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     /**
-     * Методы Socket thread'a
+     *  Socket thread methods
+     *
      */
 
     @Override
@@ -132,6 +147,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     @Override
     public synchronized void onSocketThreadException(SocketThread thread, Exception e) {
         e.printStackTrace();
+        //putLog(e.getMessage());
     }
 
     private synchronized ClientThread findUser(String value){

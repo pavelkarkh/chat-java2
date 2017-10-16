@@ -11,9 +11,18 @@ public class ServerSocketThread extends Thread {
     private final int port;
     private final int timeout;
 
+    public ServerSocketThread(ServerSocketThreadListener listener, String name, int port, int timeout) {
+        super(name);
+        this.port = port;
+        this.timeout = timeout;
+        this.listener = listener;
+        start();
+    }
+
     @Override
     public void run() {
         listener.onStartServerSocketThread(this);
+
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             serverSocket.setSoTimeout(timeout);
             listener.onCreateServerSocket(this, serverSocket);
@@ -32,14 +41,5 @@ public class ServerSocketThread extends Thread {
         } finally {
             listener.onStopServerSocketThread(this);
         }
-    }
-
-    public ServerSocketThread(ServerSocketThreadListener listener,
-                              String name, int port, int timeout) {
-        super(name);
-        this.port = port;
-        this.timeout = timeout;
-        this.listener = listener;
-        start();
     }
 }

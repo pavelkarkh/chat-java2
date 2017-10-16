@@ -11,37 +11,12 @@ public class SocketThread extends Thread{
     private Socket socket;
     private DataOutputStream out;
 
+
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
         this.socket = socket;
         this.listener = listener;
         start();
-    }
-
-    /**
-     *  this method creates streams and receives messages
-     */
-    @Override
-    public void run() {
-        try {
-            listener.onStartSocketThread(this, socket);
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-            listener.onSocketIsReady(this, socket);
-            while (!isInterrupted()) {
-                String msg = in.readUTF();
-                listener.onReceiveString(this, socket, msg);
-            }
-        } catch (IOException e) {
-            listener.onSocketThreadException(this, e);
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                listener.onSocketThreadException(this, e);
-            }
-            listener.onStopSocketThread(this);
-        }
     }
 
     public synchronized boolean sendMessage(String message) {
@@ -65,4 +40,28 @@ public class SocketThread extends Thread{
         }
     }
 
+
+
+    @Override
+    public void run() {
+        try {
+            listener.onStartSocketThread(this, socket);
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            out = new DataOutputStream(socket.getOutputStream());
+            listener.onSocketIsReady(this, socket);
+            while (!isInterrupted()) {
+                String msg = in.readUTF();
+                listener.onReceiveString(this, socket, msg);
+            }
+        } catch (IOException e) {
+            listener.onSocketThreadException(this, e);
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                listener.onSocketThreadException(this, e);
+            }
+            listener.onStopSocketThread(this);
+        }
+    }
 }

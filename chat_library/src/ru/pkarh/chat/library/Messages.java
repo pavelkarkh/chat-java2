@@ -10,6 +10,7 @@ public class Messages {
     public static final String TYPE_BROADCAST =     "/bcast";
     public static final String USER_LIST =          "/userlist";
     public static final String TYPE_RANGECAST =     "/rangecast";
+    public static final String TIMEOUT =     "/timeout";
 
     public static String getAuthRequest(String login, String password) {
         return AUTH_REQUEST + DELIMITER + login + DELIMITER + password;
@@ -38,6 +39,10 @@ public class Messages {
 
     public static String getUserList(String users) {
         return USER_LIST + DELIMITER + users;
+    }
+
+    public static String getTimeout() {
+        return TIMEOUT;
     }
 
 }

@@ -154,19 +154,19 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
 
     @Override
     public void onStartSocketThread(SocketThread thread, Socket socket) {
-        putLog("Поток сокета стартовал");
+        putLog("Ok... try connection");
     }
 
     @Override
     public void onStopSocketThread(SocketThread thread) {
-        putLog("Соединение разорвано");
+        putLog("Disconnect");
         panelBottom.setVisible(false);
         panelTop.setVisible(true);
     }
 
     @Override
     public void onSocketIsReady(SocketThread thread, Socket socket) {
-        putLog("Соединение установлено");
+        putLog("Connection established");
         String login = tfLogin.getText();
         String password = new String(tfPassword.getPassword());
         thread.sendMessage(Messages.getAuthRequest(login, password));
@@ -195,7 +195,7 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
                     setTitle(CHAT_CLIENT + " nickname: " + msg[1]);
                     break;
                 case Messages.AUTH_DENIED:
-                    putLog(message);
+                    putLog("Incorrect login or password");
                     break;
                 case Messages.MSG_FORMAT_ERROR:
                     putLog(message);
@@ -206,6 +206,9 @@ public class ClientGUI extends JFrame implements Thread.UncaughtExceptionHandler
                     String[] userArray = users.split(Messages.DELIMITER);
                     Arrays.sort(userArray);
                     userList.setListData(userArray);
+                    break;
+                case Messages.TIMEOUT:
+                    putLog("Timeout connection will be closed");
                     break;
                 default:
                     throw new RuntimeException("Unknown protocol: " + msg[0]);
